@@ -26,7 +26,7 @@ coming sooooooooooooon
 
 设计 Design Pattern
 -
-详见doc文件夹
+详见[doc](doc/README.md)文件夹
 
 代码 Scripts Sample
 -
