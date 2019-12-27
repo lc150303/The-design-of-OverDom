@@ -14,7 +14,7 @@ The purpose of this project is sharing my design pattern (in Chinese) and partia
 
 简介 Introduction
 -
-本项目绝大程度上是面向对象编程（OOP）并且任务驱动（Task-Driven）的，除了挂载在 global 对象上的全局通用函数和常量外，一切功能都由对象完成。对基本游戏对象（creep、link、lab、factory等）的调用通过任务逻辑实现。  
+本项目是高度面向对象编程（OOP）并且任务驱动（Task-Driven）的，除了挂载在 global 对象上的全局通用函数和常量外，一切功能都由对象完成。对基本游戏对象（creep、link、lab、factory等）的调用主要通过任务逻辑实现。  
 **OverDom** 帝国采取层次化管理，最高领导者即 **OverDom** ， 下有各级 Officer， 下级对象保存在上级对象的成员变量中，通过 instruction（函数参数） 和 report（函数返回值）进行上下级通信。   
 
 **OverDom** is a fully Object-Oriented programed and Task-Driven AI of [screeps](https://screeps.com/).   
