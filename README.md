@@ -30,4 +30,4 @@ coming sooooooooooooon
 
 代码 Scripts Sample
 -
-详见src文件夹
+详见[src](src/README.md)文件夹
