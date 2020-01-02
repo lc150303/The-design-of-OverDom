@@ -1,5 +1,10 @@
 设计文档
 =
+标注说明：  
+* 【设计】：其中内容完全未上线
+* 【实装】：其中内容已经完全上线
+* 【优化】：其中部分内容已经在旧版设计中上线，新增了一些未上线的改动
+* 【未来】：暂未开始设计
 
 框架设计
 -
@@ -7,8 +12,8 @@
 
 任务系统
 -
-【实装】[基本Task类](Task.md)  
-【实装】基本Step类（coming soon）  
+【实装】[基本Task类](Task.md)v1.0  
+【优化】[基本Step类](Step.md)v1.1  
 【实装】物流Step类（coming sooon）  
 【设计】基建Step类（coming soooon）  
 【设计】travel Step类（coming sooooon）  
