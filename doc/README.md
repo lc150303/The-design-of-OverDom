@@ -8,12 +8,12 @@
 
 框架设计
 -
-【架构实装|功能设计】[帝国](Leaders.md)
+【架构实装|功能设计】[帝国](Leaders.md)：代码框架及功能划分
 
 任务系统
 -
-【实装】[基本Task类](Task.md)v1.0  
-【优化】[基本Step类](Step.md)v1.1  
+【实装】[基本Task类](Task.md)v1.0：任务的通用框架，定义回调接口与步骤组合接口。  
+【优化】[基本Step类](Step.md)v1.1：定义步骤基本阶段与基本循环  
 【实装】物流Step类（coming sooon）  
 【设计】基建Step类（coming soooon）  
 【设计】travel Step类（coming sooooon）  

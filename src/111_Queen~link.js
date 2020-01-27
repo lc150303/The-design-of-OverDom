@@ -175,7 +175,7 @@ function Link_Manager(args){
 
         let adjacent_objects = link.pos.findInRange(args.possible_objects, 4);  // 寻找4格内可能影响link角色的建筑
         for(let object of adjacent_objects){
-            if(object.energy){
+            if(object.energyCapacity == 3000){
                 /**
                  *  找到资源点，是采集link
                  */
