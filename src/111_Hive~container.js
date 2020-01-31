@@ -10,7 +10,7 @@
  *  2.maintain_set用了delete
  * 
  *  TODO:
- *  1. Hive增加个函数清出无需maintain的事件和repairer身上的任务
+ *  1.
  * 
  * @param {*} Hive 
  * @param {*} room 
@@ -228,27 +228,25 @@ Container_Manager.prototype.maintain_single = function(id){
     let room = Game.rooms[this.name];
     let container = room[id];
     if(container){
-        if(this.repair_pubed[id]<=0){
+        if(this.repair_pubed[id]<=0 && container.hits < container.hitsMax-CONTAINER_THRESHOLD){
             // 发布维修任务
-            if(src_con.hits < src_con.hitsMax-CONTAINER_THRESHOLD){
+            if(id in this.maintain_set){
                 let step_args = {
-                    name: this.name+': repair src_con',
-                    sources: [src_con.id].concat(mass_stores_ids),
-                    destinations: src_con.id,
+                    name: this.name+': repair container',
+                    sources: [container.id].concat(Array.from(this.Hive.mass_stores)),
+                    destinations: container.id,
                     amount: CONTAINER_STEP_SIZE
                 };
                 let task = new Task({
                     steps: new Step_Repair(step_args),
                     name: step_args.name
                 });
-                task.is_expired = task.never_expire;
                 task.notify = ()=>{
                     this.repair_pubed[id]--;
                     this.maintain_single(id);
-                }
+                };
                 this.repair_pubed[id]++;
-
-                return {task: task};
+                this.Hive.task_queues.repair.push(task);
             }
         }else{
             // 发布定时事件
@@ -256,17 +254,17 @@ Container_Manager.prototype.maintain_single = function(id){
                 name: this.name+' maintain container',
                 id: id,
                 time: Game.time+Math.round(
-                    CONTAINER_DECAY_TIME_OWNED*(src_con.hits-CONTAINER_THRESHOLD)/CONTAINER_DECAY
+                    CONTAINER_DECAY_TIME_OWNED*(container.hits-CONTAINER_THRESHOLD)/CONTAINER_DECAY
                     ),
                 invoke: ()=>{this.maintain_single(id);}
             }
-            return {event: new Event(event_args)};
+            this.Hive.event_queue.insert(new Event(event_args));
         }
     }else{
         if(this.upgrade_containers[0] == id){
             this.upgrade_containers = [];
         }else if(this.mineral_containers[0] == id){
-            this.mineral_containers = []
+            this.mineral_containers = [];
         }else{
             this.source_containers.delete(id);
         }
@@ -278,7 +276,7 @@ Container_Manager.prototype.maintain_single = function(id){
 /**
  *  启动维修事件链
  */
-Container_Manager.prototype.start_maintainance = function(task_queue){
+Container_Manager.prototype.start_maintainance = function(){
     for(let id in this.maintain_set){
         if(this.maintain_set[id]){
             this.maintain_set[id] = true;
