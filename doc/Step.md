@@ -12,7 +12,7 @@
 * 劳动步骤在完成prepare阶段后，通过布尔变量working在perform和acquire阶段中循环
 ## 基本实现
 在执行任务时step的唯一入口是 **step.work()** 函数，初始的work函数是prepare阶段
-```JavaScript
+```js
 Step.prototype.work = function(creep){
     if(不满足一些准备条件){
         将creep进行一些准备;
@@ -28,7 +28,7 @@ Step.prototype.work = function(creep){
 }
 ```
 完成prepare后work函数替换为无需考虑prepare的 **step.work_after_prepare()** 函数，节省对prepare相关条件的判断，对外界而言仍然是通过 **work** 方法名执行。
-```JavaScript
+```js
 Step.prototype.work_after_prepare = function(creep){
     if(working){
         this.perform(creep);    //perform阶段内部完成时会把working改成false
