@@ -22,7 +22,7 @@ The purpose of this project is sharing my design pattern (in Chinese) and partia
 
 交互 Interactivation
 -
-coming sooooooooooooon
+~~coming sooooooooooooon~~
 
 设计 Design Pattern
 -
@@ -31,3 +31,7 @@ coming sooooooooooooon
 代码 Scripts Sample
 -
 详见[src](src/README.md)文件夹
+
+教程 Guide
+-
+[目录](https://zhuanlan.zhihu.com/p/104412058) (知乎)
