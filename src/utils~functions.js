@@ -1,7 +1,5 @@
 "use strict"
 
-require('utils~functions~prepare');
-
 global.get_resource_type = function(store, types, inOrder){
     if(!store){
         return undefined;
@@ -29,7 +27,7 @@ global.get_resource_type = function(store, types, inOrder){
 }
 
 global.getFreeCapacity = function(store, type){
-    // 修复 storage.store.getFreeCapacity(type) < storage.store.getFreeCapacity() 的bug
+    // 修复 storage.store.getFreeCapacity(type) > storage.store.getFreeCapacity() 的bug
     if(!store) return undefined;
     if(store.getCapacity()===null){
         return store.getFreeCapacity(type);
