@@ -30,7 +30,7 @@ hoho大佬已经[解释了缘由啦](https://www.jianshu.com/p/7226e08c4b8e)。
 ## 初步
 在角色驱动的 creep 逻辑中，creep 需要每tick遍历查找各种建筑来判断需不需要工作，这里其实存在一种 cpu
 浪费。以用 link 将 source 处采集的能量传回 storage 存放为例，平时大多数 tick 中矿点的 link 都是在默默等待矿机（挖矿的 
-creep）将能量放进去，这个时候等在 storage 附近的运输型就没必要每 tick 去判断 storage 旁边的 link 
+creep）将能量放进去，这个时候等在 storage 附近的运输型 creep 就没必要每 tick 去判断 storage 旁边的 link 
 需不需要搬出能量。在矿点 link 装满后，你的程序有一个地方会使用```link.transferEnergy()```函数将能量传回
 storage 旁边的 link，那么能不能此时在这个逻辑中顺便通知运输型 creep 该开始工作了呢？通过任务机制，我们可以实现这样的**信息传递**。
 
@@ -50,7 +50,7 @@ let link的任务 = {
 global.某个房间的任务缓存池 = [];  // 新建一个数组
 
 // 在工作代码中
-某个房间的任务缓存池.push(link的任务);   // 把上面那个任务放进缓冲池
+某个房间的任务缓存池.push(link的任务);   // 把上面那个任务放进缓存池
 ```
 如果所有的运输工作都以任务方式进行，那么我们的运输型 creep 要做的就是每 tick 监控```某个房间的任务缓存池.length```，通过这一个变量就可以知道有没有任何一个建筑需要搬运物资，比遍历不同种类的建筑省很多语句。
 ```js 
@@ -101,14 +101,14 @@ function 管理升级(){    // 工作代码，被 main.js 中的 module.exports.
     if (controller旁边的link.store[RESOURCE_ENERGY] == 0) {
         if (storage旁边的link.store[RESOURCE_ENERGY]) {
             storage旁边的link.transferEnergy(controller旁边的link);
-            controller旁边的link发布了任务 = false;  // 让下次缺能量时还可以发布任务
-        } else if (!controller旁边的link发布了任务) {
+            controller旁边的link发布了任务 = false;  // 下次缺能量时还可以发布任务
+        } else if (!controller旁边的link发布了任务) {   // 目前没有发布任务
             某个房间的任务缓存池.push({
                 从: storage,
                 把: RESOURCE_ENERGY,
                 搬到: storage旁边的link
             });
-            controller旁边的link发布了任务 = true;  // 已经发布了任务，下次就不要再发啦
+            controller旁边的link发布了任务 = true;  // 已经发布了任务，暂时就不要再发啦
         }
     }
 }
@@ -147,7 +147,7 @@ function work(creep) = {
 上面我们在 creep 中用了相同代码去完成不同的运输任务，这样的一套通用代码不一定足够高效。比如在填充 extension 时，creep 
 在填完一个 extension 后身上的能量很可能还足够填下一个 extension，如果每个 extension 发布一个任务则 creep 可能会白白跑回 
 storage 再取一次能量（取决于工作代码怎么写）。而如果我们要在同一个工作逻辑中增加判断 extension 
-这种小量任务从而连续执行，那么在执行大批量任务时又产生了不必要的 if-else 语句开销。我们能不能针对不同的任务使用不同的逻辑呢？很好办，在任务数据中增加一项就好了。
+这种小量任务从而连续执行，那么在执行大批量任务时又产生了不必要的 if-else 语句开销。我们能不能针对不同的任务使用不同的逻辑呢？很好办，在任务数据中增加一项```任务.用```来指明用什么工作方式就好了。
 ```js 
 let link的任务 = {
     从: storage旁边的link,
@@ -187,7 +187,7 @@ let extension的任务 = {
 ```
 这样我们就可以在填充 extension 时用一些非常高效的代码，比如按固定路线每 tick 同时移动和 transfer，最快速度完成任务。
 
-但是这样要增加新的建筑或者新的专用逻辑时，我们就需要修改 creep 的代码，非常不方便。为了把 creep 
+但是这样要增加新的建筑或者新的专用逻辑时，我们就需要修改 creep 的代码增加新的 case，非常不方便。为了把 creep 
 接受任务的逻辑统一起来，我们可以把```任务.用```这一项数据换成函数，接受一个```creep```对象作为参数，内部再调用这个 creep
 去执行特化的逻辑。
 ```js 
