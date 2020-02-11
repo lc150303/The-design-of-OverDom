@@ -80,8 +80,149 @@ creep 执行对应的运输工作，**非常容易增加新的建筑和新的任
 上面我们的 link 是在调用```link.transferEnergy()```这个函数时发布任务，逻辑写好就不会发布重复任务。然而假如在 controller 旁边的 link 缺能量了，我们需要从
 storage 把能量搬到 storage 旁边的 link 然后发送过去，我们的逻辑就可能大概是这样：
 ```js 
+if (controller旁边的link.store[RESOURCE_ENERGY] == 0) {
+    if (storage旁边的link.store[RESOURCE_ENERGY]) {
+        storage旁边的link.transferEnergy(controller旁边的link);
+    } else {
+        某个房间的任务缓存池.push({
+            从: storage,
+            把: RESOURCE_ENERGY,
+            搬到: storage旁边的link
+        });
+    }
+}
+```
+细心可以发现，因为 creep 可能要好几 tick 才能完成任务把能量放在 storage 旁边的 link 里，上面这个逻辑会在任务完成前的每个 
+tick 都重复发布一次任务，这可要引起混乱了。所以我们需要增加一个变量记录有没有发布任务，简单修改可以成这样：
+```js 
+var controller旁边的link发布了任务 = false;   // 初始化代码设置局部缓存变量
 
+function 管理升级(){    // 工作代码，被 main.js 中的 module.exports.loop 调用
+    if (controller旁边的link.store[RESOURCE_ENERGY] == 0) {
+        if (storage旁边的link.store[RESOURCE_ENERGY]) {
+            storage旁边的link.transferEnergy(controller旁边的link);
+            controller旁边的link发布了任务 = false;  // 让下次缺能量时还可以发布任务
+        } else if (!controller旁边的link发布了任务) {
+            某个房间的任务缓存池.push({
+                从: storage,
+                把: RESOURCE_ENERGY,
+                搬到: storage旁边的link
+            });
+            controller旁边的link发布了任务 = true;  // 已经发布了任务，下次就不要再发啦
+        }
+    }
+}
+```
+类似这样子我们就可以控制每个建筑不会发布重复任务，当然具体的变量维护需要进一步完善（避免```controller旁边的link发布了任务```值为 true 但是任务数据丢失等不一致情况）
+
+此外，上面只完成了 creep 接受任务的逻辑，creep 总不能一生只做一件事~~感动中国~~，我们其实还需要有判断任务是否完成的逻辑。
+```js 
+// 发布任务的代码中
+let 某个任务 = {
+    从: xxx,
+    把: xxx,
+    搬到: xxx,
+    完成条件: xxx
+};
+
+// creep 代码中
+function work(creep) = {
+    /**
+     * 接受任务的代码
+     */
+     
+    if (正在执行的任务) {      // 目前有任务或者刚拿到任务
+        /**
+         * 执行任务的代码
+         */
+         
+        if (正在执行的任务.完成条件) {
+            正在执行的任务 = undefined;
+        }
+    }
+}
 ```
 
-在上面的例子中，一个建筑只发布一个任务，一个任务只被一个 creep 接到，因此可以很好地**让不同 creep 同时去执行不同的任务**。但是如果我们是执行从
-storage 搬到 terminal 这样的可能大批量的任务，只有一个 creep 去搬可能较慢，我们想让多个 creep 同时去搬也很方便——一次性发布
+## 优化
+上面我们在 creep 中用了相同代码去完成不同的运输任务，这样的一套通用代码不一定足够高效。比如在填充 extension 时，creep 
+在填完一个 extension 后身上的能量很可能还足够填下一个 extension，如果每个 extension 发布一个任务则 creep 可能会白白跑回 
+storage 再取一次能量（取决于工作代码怎么写）。而如果我们要在同一个工作逻辑中增加判断 extension 
+这种小量任务从而连续执行，那么在执行大批量任务时又产生了不必要的 if-else 语句开销。我们能不能针对不同的任务使用不同的逻辑呢？很好办，在任务数据中增加一项就好了。
+```js 
+let link的任务 = {
+    从: storage旁边的link,
+    用: 适合link的逻辑,
+    把: RESOURCE_ENERGY,
+    搬到: storage,
+    完成条件: link被黄黄的填满了
+};
+
+let extension的任务 = {
+    从: storage,
+    用: 适合extension的逻辑
+    把: RESOURCE_ENERGY,
+    搬到: extension,      // 可以是 extensions，一次连续填很多个
+    完成条件: extension(s)被黄黄的填满了
+};
+```
+这样我们的运输型 creep 在工作时就可以
+```js 
+// 上面的取任务代码
+    if (正在执行的任务) {      // 目前有任务或者刚拿到任务
+        switch (正在执行的任务.用) {
+            case 适合link的逻辑: {
+                // 工作逻辑代码
+                break;
+            }
+            case 适合extension的逻辑: {
+                // 另一种工作逻辑代码
+                break;
+            }
+            // 其他case
+        }
+        if (正在执行的任务.完成条件) {
+            正在执行的任务 = undefined;
+        }
+    }
+```
+这样我们就可以在填充 extension 时用一些非常高效的代码，比如按固定路线每 tick 同时移动和 transfer，最快速度完成任务。
+
+但是这样要增加新的建筑或者新的专用逻辑时，我们就需要修改 creep 的代码，非常不方便。为了把 creep 
+接受任务的逻辑统一起来，我们可以把```任务.用```这一项数据换成函数，接受一个```creep```对象作为参数，内部再调用这个 creep
+去执行特化的逻辑。
+```js 
+// 在管理 link 的代码中
+let extension的任务 = {
+    从: storage,
+    用: function (creep) {
+        // 适合extension的工作逻辑
+    },
+    把: RESOURCE_ENERGY,
+    搬到: extension   // 可以是 extensions，一次连续填很多个
+};
+某个房间的任务缓存池.push(link的任务);
+
+// 在 creep 的代码中
+var 正在执行的任务 = undefined;    // 用了局部缓存，需要注意避免多个 creep 互相冲突
+function work(creep) = {
+    if (!正在执行的任务) {      // 目前没有任务
+        if (某个房间的任务缓存池.length) {    // 任务池里有任务
+            正在执行的任务 = 某个房间的任务缓存池.shift();   // 取出一个任务，也可以把 shift 换成 pop
+        }
+    }
+    if (正在执行的任务) {      // 目前有任务或者刚拿到任务
+        正在执行的任务.用(creep);
+        if (任务已完成的条件) {
+            正在执行的任务 = undefined;
+        }
+    }
+}
+```
+这样其实```任务.从```、```任务.把```和```任务.搬到```三个变量也不需要被其他代码读到，因此可以直接省去而把实际值写死在```任务.用```的函数里，可以尝试**极致高效**。
+
+## 延伸
+在上面的例子中，一个建筑只发布一个任务，一个任务只被一个 creep 接到，因此可以很好地**让不同 creep 
+同时去执行不同的任务**。但是如果我们是执行从 storage 搬到 terminal 这样的可能大批量的任务，只有一个 
+creep 去搬可能较慢，我们想让多个 creep 同时去搬也很方便——一次性发布多个任务即可。相应地我们需要把记录任务是否已发布的变量从布尔值改成整数值，还可以在任务数据中增加记录每个任务需要运输的资源量。
+
+上面我们采取数组的 shift() 或 pop() 函数取出任务，这相当于用数组位置作为任务的优先级，也可以实现其他优先级机制。
