@@ -53,7 +53,7 @@ creep/power creep系统
 -
 【实装】各级rcl采集管理（coming soon）  
 【实装】link管理（coming soon）  
-【设计】spawn队列管理  
+【设计】[spawn队列管理](./Spawn.md)v0.1：全局 spawn 统一管理  
 【设计】升级速度动态管理  
 【设计】tower管理（coming soooon）  
 【设计】室内任务队列（coming soooon）  
