@@ -27,17 +27,8 @@
 
 creep/power creep系统
 -
-【设计】幼虫Larva基因（creep基本封装对象）  
-【设计】工蜂Drone基因（角色型creep封装）  
-【设计】飞蛇Viper基因（任务型creep封装）  
-【设计】蟑螂Roach基因（renew型creep封装）  
-【设计】菌毯CreepTumor基因（工作中顺路repair封装）  
-【未来】xxx基因（powercreep基本封装对象）  
-【未来】xxx基因（运维operator封装）  
-【未来】xxx基因（战斗operator封装）  
-【未来】xxx基因（运维executor封装）  
-【未来】xxx基因（战斗executor封装）  
-【未来】xxx基因（commander封装）  
+【设计】[幼虫Larva基因](./Larva.md)v0.1：creep基本封装对象   
+【未来】xxx基因：powercreep基本封装对象  
 
 中队系统
 -
