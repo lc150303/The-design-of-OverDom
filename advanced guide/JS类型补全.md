@@ -14,11 +14,11 @@ Author：Scorpior
 
 ## 步骤2：安装 TypeScript
 Windows 打开 cmd 或者 PowerShell，输入```npm install -g typescript```，成功后可以用```tsc -v```查看版本，需要 ts 版本为3.7以上。     
-<img align="middle" src="./imgs/type1.png">   
+<img align="middle" src="./imgs/type1.png" width=250>   
 
 ## 步骤3：关掉 VSC 设置
 从 VSC 左下角打开设置，搜索 **optional chain**，确认 **JavaScript>Suggest: include Automatic Optional Chain Completions** 这条取消。这可以避免自动补出```?.```这一 TypeScript 语法。   
-<img align="middle" src="./imgs/type2.png">   
+<img align="middle" src="./imgs/type2.png" width=350>   
 
 ### 可选操作
 搜索 **suggest name**，确认 **JavaScript>Suggest: Names** 这条取消。这可以避免跨变量名声明范围的自动补全，也就是自动补全提示的一定是在光标位置有定义的变量（属性）。这个在下面开启类型检查后的 js 文件中会自动关闭，所以可做可不做。
@@ -41,12 +41,12 @@ Windows 打开 cmd 或者 PowerShell，输入```npm install -g typescript```，�
 在 .js 文件顶部第一行注释```// @ts-check```即可开启单文件检查。 
 
 效果1：检查 controller，**红色波浪线**提示如下图，   
-<img align="middle" src="./imgs/type3.png">   
+<img align="middle" src="./imgs/type3.png" width=350>   
 如果判断过 controller 就能通过检查   
-<img align="middle" src="./imgs/type4.png">   
+<img align="middle" src="./imgs/type4.png" width=350>   
 
 效果2：检查自定义类型，函数需要用```// @param```注释写上参数类型（VSC 中在函数上方空行输入```/**```后按回车会自动补全```@param```列表）。   
-<img align="middle" src="./imgs/type5.png">   
+<img align="middle" src="./imgs/type5.png" width=350>   
 
 其他效果就不举例了。在变量声明前用```// @type```可以声明变量类型，配合 .d.ts 文件声明自定义类型使用，效果更佳。（自定义类型写法可以参照安装的官方类型自动补全中的 index.d.ts 文件）   
 
