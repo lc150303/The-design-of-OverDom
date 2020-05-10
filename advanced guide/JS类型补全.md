@@ -3,11 +3,17 @@
 QQ群：565401831  
 游戏介绍及入手请移步：[hoho大佬简书教程](https://www.jianshu.com/p/5431cb7f42d3)  
 [系列目录](https://zhuanlan.zhihu.com/p/104412058)  
-Version：1.0   
+Version：1.1   
 Author：Scorpior   
 
 # VSCode+JavaScript 增强类型检查
 在编程时获得近似 **TypeScript** 的类型检查，辅助你减少bug。
+
+先看几个效果图。   
+<img align="middle" src="./imgs/type3.png" width=450>     
+<img align="middle" src="./imgs/type6.png" width=450>     
+<img align="middle" src="./imgs/type7.png" width=450>     
+<img align="middle" src="./imgs/type8.png" width=450>  
 
 ## 步骤1：配置 VSC+JS 开发环境 
 [**hoho教程**](https://www.jianshu.com/p/5603d0c486b1)讲的很详细。
@@ -17,7 +23,7 @@ Windows 打开 cmd 或者 PowerShell，输入```npm install -g typescript```，�
 <img align="middle" src="./imgs/type1.png" width=250>   
 
 ## 步骤3：关掉 VSC 设置
-从 VSC 左下角打开设置，搜索 **optional chain**，确认 **JavaScript>Suggest: include Automatic Optional Chain Completions** 这条取消。这可以避免自动补出```?.```这一 TypeScript 语法。   
+从 VSC 左下角打开设置，搜索 **optional chain**，确认 **JavaScript>Suggest: include Automatic Optional Chain Completions** 这条取消。这可以避免自动补出```?.```这一 TypeScript 语法。这个设置目前关掉后仍然补出```?.```，我已经提交了 issue 报告 bug。   
 <img align="middle" src="./imgs/type2.png" width=350>   
 
 ### 可选操作
@@ -40,13 +46,17 @@ Windows 打开 cmd 或者 PowerShell，输入```npm install -g typescript```，�
 ### 方法1：逐文件开启
 在 .js 文件顶部第一行注释```// @ts-check```即可开启单文件检查。 
 
-效果1：检查 controller，**红色波浪线**提示如下图，   
-<img align="middle" src="./imgs/type3.png" width=350>   
-如果判断过 controller 就能通过检查   
-<img align="middle" src="./imgs/type4.png" width=350>   
+效果1：检查 controller，如果 controller 可能不存在就对其操作会有**红色波浪线**提示如下图，   
+<img align="middle" src="./imgs/type3.png" width=450>   
+如果判断过 controller 就能通过检查。   
+<img align="middle" src="./imgs/type4.png" width=450>   
 
-效果2：检查自定义类型，函数需要用```// @param```注释写上参数类型（VSC 中在函数上方空行输入```/**```后按回车会自动补全```@param```列表）。   
-<img align="middle" src="./imgs/type5.png" width=350>   
+效果2：检查参数类型，函数需要用```// @param```注释写上参数类型（VSC 中在函数上方空行输入```/**```后按回车会自动补全```@param```列表），函数未说明参数类型或者传入参数类型不符同样有红色波浪线提示。   
+<img align="middle" src="./imgs/type5.png" width=450>   
+
+效果3：提示typo。    
+<img align="middle" src="./imgs/type6.png" width=450>  
+
 
 其他效果就不举例了。在变量声明前用```// @type```可以声明变量类型，配合 .d.ts 文件声明自定义类型使用，效果更佳。（自定义类型写法可以参照安装的官方类型自动补全中的 index.d.ts 文件）   
 
