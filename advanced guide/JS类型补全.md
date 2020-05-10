@@ -10,9 +10,13 @@ Author：Scorpior
 在编程时获得近似 **TypeScript** 的类型检查，辅助你减少bug。
 
 先看几个效果图。   
+
 <img align="middle" src="./imgs/type3.png" width=450>     
+
 <img align="middle" src="./imgs/type6.png" width=450>     
+
 <img align="middle" src="./imgs/type7.png" width=450>     
+
 <img align="middle" src="./imgs/type8.png" width=450>  
 
 ## 步骤1：配置 VSC+JS 开发环境 
