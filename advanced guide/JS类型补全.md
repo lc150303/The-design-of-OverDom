@@ -41,6 +41,7 @@ Windows 打开 cmd 或者 PowerShell，输入```npm install -g typescript```，�
         "src/*"
     ],
     "compilerOptions": {
+        "target": "es2016",
         "strict": true
     }
 }
@@ -73,6 +74,7 @@ Windows 打开 cmd 或者 PowerShell，输入```npm install -g typescript```，�
         "src/*"
     ],
     "compilerOptions": {
+        "target": "es2016",
         "checkJs": true,
         "strict": true
     }
