@@ -82,7 +82,9 @@ link 加 storage 填 extension，或者 storage 加 terminal 填 lab。**以资�
 此次设计的贪心算法由三个步骤构成，分别是源汇配对、creep 分配和路线合并。
 
 ### 源汇配对
-上面在资源登记中我们已经把每种资源类型的运输需求全收集到位，下一步就要决定每个取出或放入的需求的另一头需要与哪个建筑的放入或者取出配对，原则就是**将最近的源和汇配对**以及**非库存优先**。库存指的是把 storage 和 terminal 中闲置资源当做源、把这俩的空闲容量当做汇。
+算法假设从 global reset 后开始，当前 creep 散布于房间任意位置，并且身上不一定为空。身上有资源的 creep 一律以当前位置注册为源。
+
+在前面的资源登记中我们已经把每种资源类型的运输需求全收集到位，下一步就要决定每个取出或放入的需求的另一头需要与哪个建筑的放入或者取出配对，原则就是**将最近的源和汇配对**以及**非库存优先**。库存指的是把 storage 和 terminal 中闲置资源当做源、把这俩的空闲容量当做汇。
 
 只从所有的源或只从所有的汇去用`findClosestByPath()`，会因为遍历的先后顺序差异而陷入劣解，比如：设A、B是相同类型源，C、D是对应类型的汇，A到C、D的路程分别是 **10** 和 **11**，B到C、D的路程分别是 **2** 和 **12**，如果遍历`[A,B]`去匹配汇，则会把A匹配给C，B只剩下D可用，总路程 10+12 = 22，但如果遍历`[B,A]`会得到总路程 2+11 = 13 的结果。
 
@@ -102,7 +104,7 @@ link 加 storage 填 extension，或者 storage 加 terminal 填 lab。**以资�
     for(let target of sortedTargets){
         while(target.amount > 0 && target.nearSources.length > 0){
             let closestSource = target.pos.findClosestByPath(target.nearSources);
-            update(sortedTargets, sortedSources, target, closestSource);
+            update(sortedTargets, sortedSources, target, closestSource);    // 成功配对的源和汇要互相继承时间约束
         }
     }
     ```
@@ -115,9 +117,9 @@ link 加 storage 填 extension，或者 storage 加 terminal 填 lab。**以资�
             do3();
         }
         if(sortedSources.length > 0){
-            toStorage(sortedSources);
+            toStorage(sortedSources);   // 继承每个源的时间约束
         } else if (sortedTargets.length > 0){
-            fromStorage(sortedTargets);
+            fromStorage(sortedTargets); // 继承每个汇的时间约束
         }
     }
     ```
@@ -138,8 +140,43 @@ if (!allowedTime(source, target)) {
 高层规划时间越长、局势越和平等则规划频率越低，固有频率是高层规划的频率（下发新任务），再考虑由于外矿 invader 和过道新资源等带来不可预计的突发事件，预期调用频率是**每数百到上千 tick 计算一次**。最差情况也尽量控制在 50 tick 重算一次，因为太频繁的话 creep 一趟没跑完就更改目标可能会浪费。
 
 #### 运行结果
+之前我们登记的是运输需求，成功匹配的结果可以被视为**运输任务**，每个运输任务都指定了源位置、汇位置和资源类型，并且继承了源和汇的时间窗约束及优先级（取二者中最高）。需求登记时我们按资源类型组织，源汇配对完成后按 pos （位置）进行组织。
+```js
+// 源数组内每个元素具有互不相同的 pos，并记录了所有从这个 pos 取资源的汇
+let matchedSources = [{pos, assignedTargets}, ...];     
+
+// 汇数组内也是每个元素唯一 pos，并记录了所有运资源来这个 pos 的源
+let matchedTargets = [{pos, assignedSources}, ...];     
+```
+无法被满足的源或者汇不会被登记到这两个数组。`assignedTargets`和`assignedSources`可以是以时间窗口`startTime`升序排列的数组。
 
 ### creep 分配
+请系好安全带，smart 程度要提升了。
+
+#### 数据结构
+这里我们用来执行规划的是 Timer，或者说以 tick 数作为索引的`{}`。上面提到目前我们的 creep 散落在房间各处，有的还被登记为源，再加上 spawn 里正在生的和计划要生的，我们设计**两类事件**来维护 creep 状态。
+1. **findTask**  
+搜索源，把抵达时间或源的最早可取时间加入 Timer。  
+    ```js 
+    for(let source of matchedSources){
+        let time = Math.max(pathLength(creep, source), source.earliestStartTime);   // 取资源的最早可能时间
+        Timer[time].push(new getTask(creep, source));   // 为getTask事件绑定creep和源
+    }
+    ```
+2. **getTask**   
+触发此事件意味着对应的一个 creep 和一个源被成功选中，creep 要**按优先级**从这个源中领取**符合时间窗口**的任务，把任务指定的资源类型送到指定的汇，然后把完成一趟运输后**预计的空闲时间登记进 Timer**。
+    ```js 
+    let time = timeOfGetTask + pathLength(source, target);  // 到达源的时间 + 从源到汇的时间
+    Timer[time].push(new findTask(creep));      // 意味着等完成一趟运输后重新找源
+    ```
+
+#### 初始化
+
+#### 终止条件
+
+#### 目标耗时
+
+#### 目标频率
 
 ### 路线合并
 
