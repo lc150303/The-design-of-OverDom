@@ -32,15 +32,22 @@ if (Game.time in timer) {
 sourceNodes[RESOURCE_ENERGY].push({
 	id: container.id,
 	pos: container.pos,
-	amount: x
+	amount: x,
+	startTime: t0,  // 这个点可以被取出资源的时间，比如 lab 和 factory 反应完成时间
+	endTime: t1,    // 这个点必须被取出资源的时间，比如 link 和 container 为了不卡住挖矿速度
+	priority: L1    // 自己设置的优先级常数
 });
 // ...
 targetNodes[RESOURCE_POWER].push({
-	id: powerSpawn.id,
+	id: powerSpawn.id,  
 	pos: powerSpawn.pos,
-	amount: y
+	amount: y,
+	startTime: t0,  // 这个点可以被放入资源的时间，比如下一批 lab、factory 反应
+	endTime: t1,    // 这个点必须被填满的时间，比如 boost 不能一直拖
+	priority: L2
 });
 ```
+同一个任务的多个需求需要挂钩，后面发现某个资源不足时取消整个任务，不过尽量通过全局资源总数统计来保证发布任务时就安排好资源数量，尽量避免已发布任务互相竞争。
 
 ### 移动优化   
 通过路径缓存来复用`findClosestByPath()`中的路径，配合物流系统内对路径长度的进一步缓存，极大降低对缓存位置使用`findClosestByPath()`函数的开销。通过对穿等方式解决 creep 互相堵路的问题，使得其他功能算法中不用考虑堵路造成过长的延迟（影响对运输时间的预期）。
@@ -81,7 +88,7 @@ link 加 storage 填 extension，或者 storage 加 terminal 填 lab。**以资�
 
 稳定解用 [OverMind](https://github.com/bencbartlett/Overmind/wiki/The-Logistics-System) 中用过的 Gale-Shapley 算法得到，这个算法可以百度看解释。
 
-算法流程
+#### 算法流程
 1. 把源按优先级排降序，汇按优先级排降序，这一步其实在需求登记时就排好了，不包括库存。
 1. 从优先级高到低遍历源，每个源配给它最近的汇：
     ```js 
@@ -121,6 +128,16 @@ if (!allowedTime(source, target)) {
     return Infinity;
 }
 ```
+
+#### 目标时间
+绝大多数资源类型，比如 power、deposit 系列商品、t3 boost，都只有唯一的源或唯一的汇，这个匹配算法只循环一次就返回。算上 energy 和低级矿物，我们**争取**平均到每种资源类型上的运行时间是 0.01~0.015 CPU，每个房间的源汇匹配总共在 0.1~0.15 CPU 内完成。
+
+对于只有1个或0个源或汇的资源类型，也可以单独用`if-else`处理，写的好的话会更快。
+
+#### 目标频率
+高层规划时间越长、局势越和平等则规划频率越低，固有频率是高层规划的频率（下发新任务），再考虑由于外矿 invader 和过道新资源等带来不可预计的突发事件，预期调用频率是**每数百到上千 tick 计算一次**。最差情况也尽量控制在 50 tick 重算一次，因为太频繁的话 creep 一趟没跑完就更改目标可能会浪费。
+
+#### 运行结果
 
 ### creep 分配
 
