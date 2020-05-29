@@ -122,15 +122,15 @@ link 加 storage 填 extension，或者 storage 加 terminal 填 lab。**以资�
     }
     ```
 
-要考虑时间的话，这里的`sortedSources`和`sortedTargets`互相挑选最近时要考虑对方是否在服务窗口内，即计算路程时有
+要考虑资源取放时间的话，这里的`sortedSources`和`sortedTargets`互相挑选最近时要考虑对方是否在服务窗口内，即计算路程时有
 ```js 
 if (!allowedTime(source, target)) {
     return Infinity;
 }
 ```
 
-#### 目标时间
-绝大多数资源类型，比如 power、deposit 系列商品、t3 boost，都只有唯一的源或唯一的汇，这个匹配算法只循环一次就返回。算上 energy 和低级矿物，我们**争取**平均到每种资源类型上的运行时间是 0.01~0.015 CPU，每个房间的源汇匹配总共在 0.1~0.15 CPU 内完成。
+#### 目标耗时
+绝大多数资源类型，比如 power、deposit 系列商品、t3 boost，都只有唯一的源或唯一的汇，这个匹配算法只循环一次就返回。算上 energy 和低级矿物，我们**争取**平均到每种资源类型上的运行时间是 0.01 ~ 0.015 CPU，每个房间的源汇匹配总共在 0.1 ~ 0.15 CPU 内完成。
 
 对于只有1个或0个源或汇的资源类型，也可以单独用`if-else`处理，写的好的话会更快。
 
