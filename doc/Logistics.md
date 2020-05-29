@@ -94,15 +94,15 @@ link 加 storage 填 extension，或者 storage 加 terminal 填 lab。**以资�
 1. 把源按优先级排降序，汇按优先级排降序，这一步其实在需求登记时就排好了，不包括库存。
 1. 从优先级高到低遍历源，每个源配给它最近的汇：
     ```js 
-    for(let source of sortedSources){
+    for (let source of sortedSources) {
         let closestTarget = source.pos.findClosestByPath(sortedTargets);
         closestTarget.nearSources.push(source);
     }
     ```
 1. 从优先级高到低遍历汇，每个汇在配给它的源中选择最近的：
     ```js 
-    for(let target of sortedTargets){
-        while(target.amount > 0 && target.nearSources.length > 0){
+    for (let target of sortedTargets) {
+        while(target.amount > 0 && target.nearSources.length > 0) {
             let closestSource = target.pos.findClosestByPath(target.nearSources);
             update(sortedTargets, sortedSources, target, closestSource);    // 成功配对的源和汇要互相继承时间约束
         }
@@ -111,14 +111,14 @@ link 加 storage 填 extension，或者 storage 加 terminal 填 lab。**以资�
     这里一旦选出`closestSource`就是匹配成功，要按照需求量更新`sortedTargets`和`sortedSources`。
 1. 循环步骤2和步骤3，跳出循环时剩下的找库存：
     ```js 
-    for(let type of registeredTypes){
-        while(sortedSources.length >0 && sortedTargets.length > 0){
+    for (let type of registeredTypes) {
+        while(sortedSources.length >0 && sortedTargets.length > 0) {
             do2();
             do3();
         }
-        if(sortedSources.length > 0){
+        if(sortedSources.length > 0) {
             toStorage(sortedSources);   // 继承每个源的时间约束
-        } else if (sortedTargets.length > 0){
+        } else if (sortedTargets.length > 0) {
             fromStorage(sortedTargets); // 继承每个汇的时间约束
         }
     }
@@ -158,7 +158,7 @@ let matchedTargets = [{pos, assignedSources}, ...];
 1. **findTask**  
 搜索源，把抵达时间或源的最早可取时间加入 Timer。  
     ```js 
-    for(let source of matchedSources){
+    for (let source of matchedSources) {
         let time = Math.max(pathLength(creep, source), source.earliestStartTime);   // 取资源的最早可能时间
         Timer[time].push(new getTask(creep, source));   // 为getTask事件绑定creep和源
     }
@@ -171,13 +171,67 @@ let matchedTargets = [{pos, assignedSources}, ...];
     ```
 
 #### 初始化
+遍历所有存活的 creep（运输工），若身上为空则往当前时刻加入一个 **findTask** 事件，若非空则加入 **getTask** 事件。  
+遍历所有计划出生的运输工，往预计出生时间加入 **findTask** 事件。
+
+#### 循环体
+从当前时刻开始遍历 Timer，触发事件。主体思想是每个空闲 creep 都以所在位置为基准，计算自己到所有源取资源所需时间，也就是对每个源登记一个 getTask 事件。把每个 creep 的取到资源的时间都登记到 Timer 以后，选取时间最早的就能成功得到一次 creep 和任务的配对。一次成功的配对（即触发 getTask 事件）意味着 creep 要从空闲位置去这个源，也就是之前登记的**从相同空闲位置到其他源的信息作废**。
+```js 
+for (let time in Timer) {
+    for (let event of Timer[time]) {
+        event.invoke();
+    }
+}
+```
+分别解释两种事件的`invoke()`。对于 findTask，它可能是为还没出生的 creep 注册的事件，也可能是算法挂起后重新执行的情况，需要检查 creep 确实存活才能尝试领取运输任务。
+```js 
+if (checkAlive(event.creep)) {  // 检查一下 creep 没有意外身亡
+    // 搜索源，登记所有getTask事件
+    for (let source of matchedSources) {
+        let time = Math.max(pathLength(creep, source), source.earliestStartTime);   // 取资源的最早可能时间
+        Timer[time].push(new getTask(creep, source));   // 为getTask事件绑定creep和源
+    }
+}
+```
+对于 getTask，首先要判断它有没有因为此 creep 领了同一出发时刻的其他任务而作废，其次是看源的状态有没有因为其他 creep 领取任务而更新。其他 creep 在同一个源领过任务后有三种情况：
+1. 减去领走的部分后剩下的任务的开始时间仍然不晚于当前 getTask 的抵达时间，正常进行 getTask；
+2. 剩下任务中最早的开始时间 t0 比抵达时间晚，则往 t0 时刻注册一个相同的 getTask 事件；
+3. 不剩任何任务了，getTask 作废。
+
+如果正常进行 getTask，要在 creep 寿命耗尽前能运到汇的任务中挑选一个，这里要综合考虑任务优先级和截止时间约束，这二者可以通过一定的策略合并成优先级。如果没有任务能在 creep 寿命耗尽前完成，则此次 getTask 作废。成功选定任务要做三件事：
+1. 将同一时刻出发的其他 getTask 事件置为无效；
+2. 将这个任务的剩余量减去 creep 容量；
+3. 往运到汇卸货后的时间注册一个 findTask 事件。
+```js 
+if (event.valid) {  // 这个事件没有因为同一个 creep 领了其他任务而失效
+    if (checkSource(event.source)) {    // 这里要检查源的任务是否已被领走
+        let task = findCompletableTask(event.creep, event.source);  // 找一个死前能运完的最高优先级任务
+        if (task) { // 找到了
+            invalidate(...);    // 将其他一些getTask置为无效
+            updateSource(event.source); // 更新源上的剩余任务
+            let time = timeOfGetTask + pathLength(source, target);  // 到达源的时间 + 从源到汇的时间
+            Timer[time].push(new findTask(creep));      // 意味着等完成一趟运输后重新找源
+        }
+    } else {
+        updateEvent();  // 按照源的剩余任务更新事件
+    }
+}
+```
 
 #### 终止条件
+因为不打算做全局规划，所以不等把所有任务安排完就提前停止。停止条件有三个：
+1. 所有 creep 都领到了任务，则按未来最近一次 findTask 时间把规划算法挂起到全局 Timer 中，到时候再尝试规划下一批任务。这也就是前面所说的把算法挂起后重新执行的情况。这样的好处是如果有资源需求变更，下一次 findTask 时查找的就是更新后的任务。
+2. 所有任务安排完了，碰巧比较闲，那就等待新需求唤醒规划算法，不用挂在全局 Timer。
+3. 所有未领到任务的 creep 的所有 getTask 时间都作废或者往后挂起，区分一下：
+    1. 某个 creep 所有的 getTask 作废，如果不是任务安排完了就是它的 ttl 太短了，那么只要其他的 creep 都领到任务就可视为第一种情况。
+    2. 某个 creep 的所有未作废 getTask 都往后挂起了，也就是它去到目的地也要等，不如先按兵不动，把规划算法按所有这样的 creep 的最短等待时间挂起到全局 Timer 等待。
 
 #### 目标耗时
 
 #### 目标频率
 
 ### 路线合并
+
+## 突发情况
 
 ## 策略接口
