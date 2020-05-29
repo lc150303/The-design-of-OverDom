@@ -115,6 +115,13 @@ link 加 storage 填 extension，或者 storage 加 terminal 填 lab。**以资�
     }
     ```
 
+要考虑时间的话，这里的`sortedSources`和`sortedTargets`互相挑选最近时要考虑对方是否在服务窗口内，即计算路程时有
+```js 
+if (!allowedTime(source, target)) {
+    return Infinity;
+}
+```
+
 ### creep 分配
 
 ### 路线合并
