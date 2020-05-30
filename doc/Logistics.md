@@ -152,7 +152,7 @@ let matchedTargets = [{pos, assignedSources}, ...];
 
 ### creep 分配
 请系好安全带，smart 程度要提升了。  
-此算法名字为 EpicSmart 算法。—— 我
+此算法名字为 **EpicSmart** 算法。—— 我
 
 #### 数据结构
 这里我们用来执行规划的是 Timer，或者说以 tick 数作为索引的`{}`，取名叫**规划轴**。上面提到目前我们的 creep 散落在房间各处，有的还被登记为源，再加上 spawn 里正在生的和计划要生的，我们设计**两类事件**来维护 creep 状态。
