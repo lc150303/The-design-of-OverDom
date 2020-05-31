@@ -23,4 +23,4 @@ creep/power creep系统
 室内运维
 -
 【设计】[spawn队列管理](Spawn.md)v0.1：全局 spawn 统一管理  
-【设计】[智慧物流](Logistics.md)v0.1：私有房间及外矿运输调度
+【设计】[智慧物流](Logistics.md)v0.2：私有房间及外矿运输调度

@@ -15,7 +15,7 @@ Epic smart logistics system
 注：本身多个源、多个汇、多个 creep 的互相匹配就是一个不小的问题了，再加上不同的资源种类与数量，再对源、汇、creep 都加上时间约束，整个问题难得令人发指，全局算法过于难设计，先用个贪心策略解决问题。
 
 ## 基础工具   
-### timer   
+### Timer   
 事件链中的计时器，是一个`{}`，以 tick 数字作为入口，每个 tick 对应一个数组存放此 tick 要做的事情。每 tick 会取出当前需要做的事情来处理。
 ```js
 if (Game.time in timer) {
@@ -25,6 +25,9 @@ if (Game.time in timer) {
 	delete timer[Game.time]; // 防内存泄露
 }
 ```
+
+### 优先队列
+用于执行核心算法，按优先级插入，`pop()`时取出优先级最小的。采用小根堆实现。
 
 ### 需求登记
 各房间独自规划运输工作，所以运输需求也分房间登记。登记方式按照[流模式](https://github.com/lc150303/The-design-of-OverDom/blob/master/advanced%20guide/%E8%BF%90%E8%BE%93%E6%A8%A1%E5%BC%8Fa.md)中将源和汇区分开，storage 和 terminal 作为最后考虑的（优先级最低）的源与汇。
@@ -155,31 +158,34 @@ let matchedTargets = [{pos, assignedSources}, ...];
 此算法名字为 **EpicSmart** 算法。—— 我
 
 #### 数据结构
-这里我们用来执行规划的是 Timer，或者说以 tick 数作为索引的`{}`，取名叫**规划轴**。上面提到目前我们的 creep 散落在房间各处，有的还被登记为源，再加上 spawn 里正在生的和计划要生的，我们设计**两类事件**来维护 creep 状态。
+这里我们用来执行规划的是优先队列，具体是以优先级组织的小根堆 minHeap，相同优先级的合并为一个元素，支持按优先级在 O(1) 时间内读写元素，取名叫**规划轴**。
+
+上面提到目前我们的 creep 散落在房间各处，有的还被登记为源，再加上 spawn 里正在生的和计划要生的，我们设计**两类事件**来维护 creep 状态。
 1. **findTask**  
-搜索源，把抵达时间或源的最早可取时间加入 Timer。  
+搜索源，把抵达时间或源的最早可取时间加入 minHeap。  
     ```js 
     for (let source of matchedSources) {
         let time = Math.max(pathLength(creep, source), source.earliestStartTime);   // 取资源的最早可能时间
-        Timer[time].push(new getTask(creep, source));   // 为getTask事件绑定creep和源
+        minHeap.push(time, new getTask(creep, source));   // 以时间作优先级为getTask事件绑定creep和源
     }
     ```
 2. **getTask**   
-触发此事件意味着对应的一个 creep 和一个源被成功选中，creep 要**按优先级**从这个源中领取**符合时间窗口**的任务，把任务指定的资源类型送到指定的汇，然后把完成一趟运输后**预计的空闲时间登记进 Timer**。
+触发此事件意味着对应的一个 creep 和一个源被成功选中，creep 要**按优先级**从这个源中领取**符合时间窗口**的任务，把任务指定的资源类型送到指定的汇，然后把完成一趟运输后**预计的空闲时间登记进 minHeap**。
     ```js 
     let time = timeOfGetTask + pathLength(source, target);  // 到达源的时间 + 从源到汇的时间
-    Timer[time].push(new findTask(creep));      // 意味着等完成一趟运输后重新找源
+    minHeap.push(time, new findTask(creep));      // 意味着等完成一趟运输后重新找源
     ```
+规划轴只用于存储这两个事件，存储的优先级以时间为基础，取出优先级最小的元素一般是时间最早的。
 
 #### 初始化
 遍历所有存活的 creep（运输工），若身上为空则往当前时刻加入一个 **findTask** 事件，若非空则加入 **getTask** 事件。  
 遍历所有计划出生的运输工，往预计出生时间加入 **findTask** 事件。
 
 #### 循环体
-从当前时刻开始遍历 Timer，触发事件。主体思想是每个空闲 creep 都以所在位置为基准，计算自己到所有源取资源所需时间，也就是对每个源登记一个 getTask 事件。把每个 creep 的取到资源的时间都登记到 Timer 以后，选取时间最早的就能成功得到一次 creep 和任务的配对。一次成功的配对（即触发 getTask 事件）意味着 creep 要从空闲位置去这个源，也就是之前登记的**从相同空闲位置到其他源的信息作废**。
+循环调用`minHeap.pop()`，触发事件。主体思想是每个空闲 creep 都以所在位置为基准，计算自己到所有源取资源所需时间，也就是对每个源登记一个 getTask 事件。把每个 creep 的取到资源的时间都登记到 minHeap 以后，选取时间最早的就能成功得到一次 creep 和任务的配对。一次成功的配对（即触发 getTask 事件）意味着 creep 要从空闲位置去这个源，也就是之前登记的**从相同空闲位置到其他源的信息作废**。
 ```js 
-for (let time in Timer) {
-    for (let event of Timer[time]) {
+while(!shouldStop){
+    for(let event of minHeap.pop()){
         event.invoke();
     }
 }
@@ -190,7 +196,7 @@ if (checkAlive(event.creep)) {  // 检查一下 creep 没有意外身亡
     // 搜索源，登记所有getTask事件
     for (let source of matchedSources) {
         let time = Math.max(pathLength(creep, source), source.earliestStartTime);   // 取资源的最早可能时间
-        Timer[time].push(new getTask(creep, source));   // 为getTask事件绑定creep和源
+        minHeap.push(time, new getTask(creep, source));   // 以时间作优先级为getTask事件绑定creep和源
     }
 }
 ```
@@ -211,7 +217,7 @@ if (event.valid) {  // 这个事件没有因为同一个 creep 领了其他任�
             invalidate(...);    // 将其他一些getTask置为无效
             updateSource(event.source); // 更新源上的剩余任务
             let time = timeOfGetTask + pathLength(source, target);  // 到达源的时间 + 从源到汇的时间
-            Timer[time].push(new findTask(creep));      // 意味着等完成一趟运输后重新找源
+            minHeap.push(time, new findTask(creep));      // 意味着等完成一趟运输后重新找源
         }
     } else {
         updateEvent();  // 按照源的剩余任务更新事件
@@ -230,16 +236,16 @@ if (event.valid) {  // 这个事件没有因为同一个 creep 领了其他任�
 #### 目标耗时
 核心贪心次数和 creep 数量关系不大，设源 pos （而不是源建筑）的数量为 **N**，一趟成功的运输必然至少有一次 findTask 和 N 个 getTask。一个房间内可能作为源的建筑有核心区、10个 lab、2个能量矿和1个 mineral，再加上几个外矿，最大数量一般也在 20 个以内。findTask 中需要得到从 creep 位置到所有 N 个点的路程长度，按已有策略查找路径缓存的开销应该可以控制在每个点 0.02 CPU，总计在 0.4 以内。采取更激进的信息缓存策略应该可以把开销压缩到 0.1 CPU 以内，如果再配合**相近 pos 合并**或**排除掉肯定无效的 pos**可以进一步缩减开销。
 
-N-1 个无效 getTask 一般是被有效的那一个置无效的，只需经过很简单的插入 Timer、置无效、读取时判断无效，N-1 个的总开销应该也可以在 0.02 CPU 里解决。
+N-1 个无效 getTask 一般是被有效的那一个置无效的，需经过插入 minHeap（可能是 O(logn)）、置无效、读取时判断无效，N-1 个的总开销应该追求在 0.2 CPU 里解决。
 
 1个有效的 getTask 意味着经过了一系列有效性判断，再从中挑选出满足时间条件的优先级最高的任务，这受任务存储结构的影响，好的排序意味着前面源汇配对时可能要多花一些开销。 在所有的 N 个点中，矿点的**任务非常单一**，lab 和 factory 的任务**出现频率很低**，真正任务数量多的也就核心区，估计核心区也能在判断三五个任务以内选定最优的任务，不过这个需要实现代码以后统计分析。运输到汇的路程在源汇统计时已经算过，再算上登记下一次 findTask 的开销，一次有效的 getTask 的总开销要争取平均在 0.1 CPU 以内。
 
-这样我们选定一个任务（即一趟运输）的开销**追求**在 0.1 + 0.02 + 0.1 ≤ 0.25 CPU 以内，实际做到多少需要实现后统计。这意味着只要成功选取离源更近的 creep 来执行任务，节约1~2格路的移动开销就能回本。源和汇已经完成了最优匹配，所以运到汇的路程肯定是最短的。
+这样我们选定一个任务（即一趟运输）的开销**追求**在 0.1 + 0.2 + 0.1 ≤ 0.4 CPU 以内，实际做到多少需要实现后统计。这意味着只要成功选取离源更近的 creep 来执行任务，节约2~3格路的移动开销就能回本。源和汇已经完成了最优匹配，所以运到汇的路程肯定是最短的。
 
 如果有某些 creep 触发了终止条件中的第三项，则会带来额外的逻辑开销。其中 ttl 过短的情况在 creep 一辈子就一次，均摊以后开销很小。getTask 延期的频率需要真实统计分析~~（懒得想）~~。
 
 #### 目标频率
-这个计算频率主要是看运输趟数，只要保证平均每趟运输能比对照算法节约1~2步就能赚，如果对照算法是不考虑距离让 creep 去随机执行任务的话那可能赚很多。
+这个计算频率主要是看运输趟数，只要保证平均每趟运输能比对照算法节约2~3步就能赚，如果对照算法是不考虑距离让 creep 去随机执行任务的话那可能赚很多。
 
 ### 路线合并
 一趟运输可能遇到任务剩余量不足以装满 creep 的情况，也就是“不满趟”，可能把多个不满趟的运输合并成一趟会赚，这就是开头需求描述中第3个情景。
@@ -289,6 +295,7 @@ N-1 个无效 getTask 一般是被有效的那一个置无效的，只需经过�
 建筑上的未完成任务取消，ruin 作为源出现新需求，用上面的**需求取消**和**突发需求**结合起来处理。
 ### creep 死亡
 运输工死亡不导致需求取消，墓碑作为源，同**突发需求**。
+
 ## 总结
 算法时间中的不确定因素主要有 **getTask 延期比例**和**突发情况出现频率**这两方面，此外一些边边角角的逻辑操作也会有开销，最后平均开销能优化到多少**需要真实统计测量**。
 
