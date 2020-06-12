@@ -8,12 +8,15 @@
 * 开采外矿
 * 放弃外矿
 
-## 子任务
+## 指令 Directives
+指令是
+
 
 类型|触发条件|类型|触发条件
 :-:|:-:|:-:|:-:
 claim|gcl提升`or`unclaim完成`or`进攻路线过长|   unclaim|战损统计`or`发现可转移的好房
-rebuild|reset时扫描`or`战损统计  |defense|入侵力量分析
+rebuild|reset时扫描`or`战损统计|   defense|入侵力量分析
+highway|
 
 ### 1.claim 扩张  
 影响因素
