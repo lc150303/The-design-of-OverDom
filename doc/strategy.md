@@ -12,7 +12,8 @@
 
 类型|触发条件|类型|触发条件
 :-:|:-:|:-:|:-:
-claim|gcl提升 || unclaim完成|unclaim|战损统计`||`发现可转移的好房
+claim|gcl提升`||`unclaim完成|unclaim|战损统计`||`发现可转移的好房
+
 
 ### 1.claim 扩张  
 影响因素
