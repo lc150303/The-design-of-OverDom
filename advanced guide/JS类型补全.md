@@ -27,7 +27,7 @@ Windows 打开 cmd 或者 PowerShell，输入```npm install -g typescript```，�
 <img align="middle" src="./imgs/type1.png" width=250>   
 
 ## 步骤3：关掉 VSC 设置
-从 VSC 左下角打开设置，搜索 **optional chain**，确认 **JavaScript>Suggest: include Automatic Optional Chain Completions** 这条取消。这可以避免自动补出```?.```这一 TypeScript 语法。这个设置目前关掉后仍然补出```?.```，我已经提交了 issue 报告 bug。   
+从 VSC 左下角打开设置，搜索 **optional chain**，确认 **JavaScript>Suggest: include Automatic Optional Chain Completions** 这条取消。这可以避免自动补出```?.```这一 TypeScript 语法。这个设置已经正常生效。   
 <img align="middle" src="./imgs/type2.png" width=350>   
 
 ### 可选操作
