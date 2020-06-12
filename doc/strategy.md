@@ -12,8 +12,8 @@
 
 类型|触发条件|类型|触发条件
 :-:|:-:|:-:|:-:
-claim|gcl提升**or**unclaim完成|unclaim|战损统计`or`发现可转移的好房
-
+claim|gcl提升`or`unclaim完成`or`进攻路线过长|   unclaim|战损统计`or`发现可转移的好房
+rebuild|reset时扫描`or`战损统计  |defense|入侵力量分析
 
 ### 1.claim 扩张  
 影响因素
