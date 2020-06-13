@@ -23,8 +23,10 @@ interface IHive {
     // resources
     send(callback): void;
     // unclaim
-    unclaim(callback): void;    // 与send()指令分开，send()用于运走物资
+    unclaim(callback): void;    // 与send()指令分开，send()用于清空物资
     // 建造
     build(callback): void;
+    // 填核弹
+    fillNuker(callback): void;  // 安排在核弹快冷却好时，而不是刚发射后
 }
 ```
