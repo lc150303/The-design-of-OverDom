@@ -28,3 +28,4 @@ creep/power creep系统
 
 战斗
 -
+【设计】[前线指挥](battle.md)v0.1：战场单位的控制机制
