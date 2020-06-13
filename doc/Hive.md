@@ -4,7 +4,7 @@
 ## Interface
 ```ts 
 interface IHive {
-    // 获取目前在干啥
+    // 获取目前在干啥、能干啥
     getStats(): {
         processPower: amount,
         upgrade: amount,
@@ -20,7 +20,11 @@ interface IHive {
     reverseReaction(type, callback): void;
     // factory
     produce(type, callback): void;
-    // 
-    
+    // resources
+    send(callback): void;
+    // unclaim
+    unclaim(callback): void;    // 与send()指令分开，send()用于运走物资
+    // 建造
+    build(callback): void;
 }
 ```
