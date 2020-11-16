@@ -3,8 +3,8 @@
 QQ群：565401831  
 游戏介绍及入手请移步：[hoho大佬简书教程](https://www.jianshu.com/p/5431cb7f42d3)  
 [系列目录](https://zhuanlan.zhihu.com/p/104412058)  
-Version：0.0   
-Author：Cookies   
+Version：1.0   
+Author：Cookies, Scorpior
 
 # 如何debug你的代码
 
@@ -20,13 +20,11 @@ Author：Cookies
 
 满屏红字.jpg 
 
-TODO: 蝎子修改一下，换成实际报错的图说明一下
-
 首先，每个报错的后面都会跟着一串
 
 <img align="middle" src="./imgs/debug1.png" width=450>     
 
-这一串是非常有用的数据。可以看到每个函数调用和行数。
+这一串是非常有用的数据。可以看到每个函数调用和行数。首先其中第一行是报错原因，简要描述了你是数据类型错误、是数组越界还是其他什么。第二行往后是报错代码所在的位置，左边`roomNameToXY`是函数名，右边括号里的信息是 **文件名：行号：这行第几个字符**，其中`<runtime>`代表是服务器代码，乱码是自己的中文文件名，然后`Task~Step~Transport`之类的就是正常显示的文件名了。报错文件中排列越靠上的就越接近报错位置，一般可以忽略其中代表服务器代码的信息，直接找自己写的文件中对应位置就好。
 
 如果并没有报错，没有Stack Trace，但是想看到哪个函数调用了这个函数的话，可以手动打印：
 
