@@ -1,4 +1,4 @@
-<img align="middle" src="./imgs/arena_title.png">
+<img align="middle" src="../imgs/arena_title.png">
   
 QQ群：565401831  
 游戏介绍及入手请移步：[hoho大佬简书教程](https://www.jianshu.com/p/5431cb7f42d3)  
@@ -63,7 +63,7 @@ npm i
 即可自动安装 lodash、node 和 screeps-arena 类型文件。
 
 ### 2. 类型定义
-现在我们要做的是为 `_` 写类型声明，使得在输入 `_.` 后能获得函数名提示，且不会报错说“`-` 未定义”。关于为 `.js` 文件开启类型检查可以看我的[另一篇文章](../JS类型补全.md)。
+现在我们要做的是为 `_` 写类型声明，使得在输入 `_.` 后能获得函数名提示，且不会报错说“`_` 未定义”。关于为 `.js` 文件开启类型检查可以看我的[另一篇文章](../JS类型补全.md)。
 
 我们项目里都会有个自定义的类型文件，一般叫 `index.d.ts`，只要后缀名是 `.d.ts` 即可。安装后的 lodash 类型不会直接暴露在全局空间，所以需要在 `index.d.ts` 里 `import`
 ```typescript
