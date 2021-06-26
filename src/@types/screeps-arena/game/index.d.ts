@@ -24,8 +24,20 @@ declare module "game" {
      * "alpha"
      */
     season: string;
+
+    /**
+     * max duration of this arena
+     */
+    ticksLimit: number,
+    /**
+     * max duration of one tick measured by real time
+     */
+    cpuTimeLimit: number,
+    /**
+     * max duration of the first tick measured by real time
+     */
+    cpuTimeLimitFirstTick: number,
   };
 
-  export function createConstructionSite(x: number, y: number, structurePrototype: string /*STRUCTURE_PROTOTYPES*/):
-  { object?: Structure; error?: ERR_BUSY | ERR_INVALID_ARGS | ERR_NOT_ENOUGH_ENERGY };
+  export function createConstructionSite(x: number, y: number, structurePrototype: string /*STRUCTURE_PROTOTYPES*/): { object?: Structure; error?: ERR_BUSY | ERR_INVALID_ARGS | ERR_NOT_ENOUGH_ENERGY };
 }

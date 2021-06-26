@@ -35,7 +35,13 @@ declare module "game/utils" {
   /**
    * Get count of game ticks passed since the start of the game
    */
-  export function getTime(): number;
+  export function getTicks(): number;
+
+  /**
+   * Get the elapsed CPU wall time during the current tick in nanoseconds
+   */
+  export function getCpuTime(): number;
+
   /**
    * Get an object with the specified unique ID.
    */

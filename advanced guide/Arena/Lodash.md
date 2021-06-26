@@ -76,10 +76,12 @@ import _ from "lodash";
 import _ from "lodash";
 
 declare global {
-    const _: _;     // 声明一个全局变量 _ 是 lodash 库
+    const _: typeof _;     // 声明一个全局变量 _ 是 lodash 库
 }
 ```
 然后我们在任意 `.js` 文件就可以获得对 lodash 函数的自动补全。
 
 ## 四. 番外
 按上面那样安装完 screeps-arena 类型包后，我的 VSCode 还是无法识别里面的类型文件，因为在 `node_modules\@types\screeps-arena` 目录下没有 `index.d.ts` 而是放在它子目录 `dist` 里了。我通过把 `node_modules\@types\screeps-arena\dist` 文件夹下的所有东西拷贝到上一级目录解决。
+
+此外，我还修正了一些编写错误，并按我的习惯整理了类型定义文件的编写格式。我觉得应该是对效率和整洁度有益的。可供[下载使用](../../src/@types)。
