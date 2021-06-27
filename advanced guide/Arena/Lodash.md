@@ -50,7 +50,7 @@ import {} from 'lodash文件的相对路径'
   "author": "Scorpior",
   "license": "ISC",
   "dependencies": {
-    "@types/lodash": "^4.17.21",
+    "@types/lodash": "^4.14.170",
     "@types/node": "^13.9.1",
     "@types/screeps-arena": "screepers/typed-screeps-arena#develop"
   }
