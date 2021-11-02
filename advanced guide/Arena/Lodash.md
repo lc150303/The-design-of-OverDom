@@ -1,6 +1,7 @@
 <img align="middle" src="../imgs/arena_title.png">
   
-QQ群：565401831  
+Screeps 主QQ群：565401831  
+Arena 小群：257062491  
 游戏介绍及入手请移步：[hoho大佬简书教程](https://www.jianshu.com/p/5431cb7f42d3)  
 [系列目录](https://zhuanlan.zhihu.com/p/104412058)  
 Version：1.0  

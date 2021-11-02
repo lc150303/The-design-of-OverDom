@@ -20,18 +20,16 @@ The purpose of this project is sharing my design pattern (in Chinese) and partia
 **OverDom** is a fully Object-Oriented programed and Task-Driven AI of [screeps](https://screeps.com/).   
 
 
-交互 Interactivation
--
-~~coming sooooooooooooon~~
-
-设计 Design Pattern
--
-详见[doc](doc/README.md)文件夹
-
-代码 Scripts Sample
--
-详见[src](src/README.md)文件夹
-
 教程 Guide
 -
 [目录](https://zhuanlan.zhihu.com/p/104412058) (知乎)
+
+
+交互 Interactivation
+-
+
+设计 Design Pattern
+-
+
+代码 Scripts Sample
+-
