@@ -1,16 +1,19 @@
-
-type RESOURCE_SCORE = "score";
-type RESOURCE_SCORE_XYZ = "score_x" | "score_y" | "score_z";
-type EFFECT_FREEZE = "freeze";
-type EFFECT_HEAL = "heal";
-type EFFECT_DAMAGE = "damage";
-
 declare module "arena/constants" {
-  export const RESOURCE_SCORE = "score";
-  export const RESOURCE_SCORE_X = "score_x";
-  export const RESOURCE_SCORE_Y = "score_y";
-  export const RESOURCE_SCORE_Z = "score_z";
-  export const EFFECT_FREEZE = "freeze";
-  export const EFFECT_HEAL = "heal";
-  export const EFFECT_DAMAGE = "damage";
+  export type RESOURCE_SCORE = "score";
+  export type RESOURCE_SCORE_X = "score_x";
+  export type RESOURCE_SCORE_Y = "score_y";
+  export type RESOURCE_SCORE_Z = "score_z";
+  export type EFFECT_FREEZE = "freeze";
+  export type EFFECT_HEAL = "heal";
+  export type EFFECT_DAMAGE = "damage";
+
+  export type ArenaResourceConstant = RESOURCE_SCORE | RESOURCE_SCORE_X | RESOURCE_SCORE_Y | RESOURCE_SCORE_Z;
+
+  export const RESOURCE_SCORE: RESOURCE_SCORE;
+  export const RESOURCE_SCORE_X: RESOURCE_SCORE_X;
+  export const RESOURCE_SCORE_Y: RESOURCE_SCORE_Y;
+  export const RESOURCE_SCORE_Z: RESOURCE_SCORE_Z;
+  export const EFFECT_FREEZE: EFFECT_FREEZE;
+  export const EFFECT_HEAL: EFFECT_HEAL;
+  export const EFFECT_DAMAGE: EFFECT_DAMAGE;
 }

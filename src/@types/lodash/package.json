@@ -1,0 +1,88 @@
+{
+  "_args": [
+    [
+      "@types/lodash@4.14.170",
+      "H:\\Game\\Screeps\\Arena"
+    ]
+  ],
+  "_from": "@types/lodash@4.14.170",
+  "_id": "@types/lodash@4.14.170",
+  "_inBundle": false,
+  "_integrity": "sha512-bpcvu/MKHHeYX+qeEN8GE7DIravODWdACVA1ctevD8CN24RhPZIKMn9ntfAsrvLfSX3cR5RrBKAbYm9bGs0A+Q==",
+  "_location": "/@types/lodash",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "@types/lodash@4.14.170",
+    "name": "@types/lodash",
+    "escapedName": "@types%2flodash",
+    "scope": "@types",
+    "rawSpec": "4.14.170",
+    "saveSpec": null,
+    "fetchSpec": "4.14.170"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.170.tgz",
+  "_spec": "4.14.170",
+  "_where": "H:\\Game\\Screeps\\Arena",
+  "bugs": {
+    "url": "https://github.com/DefinitelyTyped/DefinitelyTyped/issues"
+  },
+  "contributors": [
+    {
+      "name": "Brian Zengel",
+      "url": "https://github.com/bczengel"
+    },
+    {
+      "name": "Ilya Mochalov",
+      "url": "https://github.com/chrootsu"
+    },
+    {
+      "name": "Stepan Mikhaylyuk",
+      "url": "https://github.com/stepancar"
+    },
+    {
+      "name": "AJ Richardson",
+      "url": "https://github.com/aj-r"
+    },
+    {
+      "name": "e-cloud",
+      "url": "https://github.com/e-cloud"
+    },
+    {
+      "name": "Georgii Dolzhykov",
+      "url": "https://github.com/thorn0"
+    },
+    {
+      "name": "Jack Moore",
+      "url": "https://github.com/jtmthf"
+    },
+    {
+      "name": "Dominique Rau",
+      "url": "https://github.com/DomiR"
+    },
+    {
+      "name": "William Chelman",
+      "url": "https://github.com/WilliamChelman"
+    }
+  ],
+  "dependencies": {},
+  "description": "TypeScript definitions for Lo-Dash",
+  "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped#readme",
+  "license": "MIT",
+  "main": "",
+  "name": "@types/lodash",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+    "directory": "types/lodash"
+  },
+  "scripts": {},
+  "typeScriptVersion": "3.5",
+  "types": "index.d.ts",
+  "typesPublisherContentHash": "a1ab5370dc7d2482887ea9005d6da6d52ec549e607cb6eea7e84a4b6b69751ce",
+  "version": "4.14.170"
+}

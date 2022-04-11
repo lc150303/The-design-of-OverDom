@@ -34,6 +34,7 @@ export default 0;
 在你的 `main.mjs` 文件头部加一句
 ```javascript
 import {} from 'lodash文件的相对路径'
+// 例如文件在 utils/lodash.js 则相对路径为 './utils/lodash'
 ```
 这样就可以在任意文件中通过 `_.函数名` 来使用 lodash 里面的函数。原理是 lodash 文件被 import 时已经把自身挂载在 `global` 对象上，命名为 `_` （单个下划线），可以被视为全局变量在任意文件直接调用。
 ## 三. lodash 语法自动补全

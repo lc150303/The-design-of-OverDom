@@ -1,47 +1,27 @@
 /* eslint-disable camelcase */
-
-interface HeapStatistics {
-  total_heap_size: number;
-  total_heap_size_executable: number;
-  total_physical_size: number;
-  total_available_size: number;
-  used_heap_size: number;
-  heap_size_limit: number;
-  malloced_memory: number;
-  peak_malloced_memory: number;
-  does_zap_garbage: 0 | 1;
-  externally_allocated_size: number;
-}
-
 declare module "game/utils" {
-  // import {
-  //   BuildableStructure,
-  //   DirectionConstant,
-  //   ERR_FULL,
-  //   ERR_INVALID_ARGS,
-  //   ERR_INVALID_TARGET,
-  //   TERRAIN_SWAMP,
-  //   TERRAIN_WALL
-  // } from "game/constants";
-  // import {
-  //   ConstructionSite,
-  //   GameObject,
-  //   Id,
-  //   RoomPosition,
-  //   _Constructor
-  // } from "game/prototypes";
-  // import { FindPathOpts, PathStep } from "game/path-finder";
+  import {
+    BuildableStructure,
+    DirectionConstant,
+    ERR_FULL,
+    ERR_INVALID_ARGS,
+    ERR_INVALID_TARGET,
+    TERRAIN_SWAMP,
+    TERRAIN_WALL
+  } from "game/constants";
+  import {
+    ConstructionSite,
+    GameObject,
+    Id,
+    RoomPosition,
+    _Constructor
+  } from "game/prototypes";
+  import { FindPathOpts, PathStep } from "game/path-finder";
 
   /**
    * Get count of game ticks passed since the start of the game
    */
   export function getTicks(): number;
-
-  /**
-   * Get the elapsed CPU wall time during the current tick in nanoseconds
-   */
-  export function getCpuTime(): number;
-
   /**
    * Get an object with the specified unique ID.
    */
@@ -141,4 +121,34 @@ declare module "game/utils" {
     error?: ERR_INVALID_ARGS | ERR_INVALID_TARGET | ERR_FULL;
   };
 
+  /**
+   * Create new ConstructionSite at the specified location.
+   * @param pos The X,Y position.
+   * @param structurePrototype One of the following constants: StuctureExtension, StructureTower
+   * @returns Result Code: OK, ERR_INVALID_TARGET, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
+   */
+  export function createConstructionSite(
+    pos: RoomPosition,
+    structureType: _Constructor<BuildableStructure>
+  ): {
+    object?: ConstructionSite;
+    error?: ERR_INVALID_ARGS | ERR_INVALID_TARGET | ERR_FULL;
+  };
+  /**
+   * Get CPU wall time elapsed in the current tick in nanoseconds.
+   */
+   export function getCpuTime(): number;
+
+  export interface HeapStatistics {
+    total_heap_size: number;
+    total_heap_size_executable: number;
+    total_physical_size: number;
+    total_available_size: number;
+    used_heap_size: number;
+    heap_size_limit: number;
+    malloced_memory: number;
+    peak_malloced_memory: number;
+    does_zap_garbage: 0 | 1;
+    externally_allocated_size: number;
+  }
 }

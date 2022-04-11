@@ -1,3 +1,7 @@
+# 安装方法
+1. 确保 vscode 项目根目录有 node_modules\@types 文件夹，无则新建；
+2. 将 screeps-arena 文件夹整体拷贝到 node_modules\@types 文件夹下。
+
 # typed-screeps-arena
 
 Typings for the game Screeps:Arena based on the following docs https://steamcommunity.com/sharedfiles/filedetails/?id=2505541950
